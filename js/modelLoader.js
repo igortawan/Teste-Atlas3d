@@ -44,8 +44,13 @@ function indexExternalModel(root, structures) {
   root.updateMatrixWorld(true);
 
   let unmatchedCount = 0;
+  const skinMeshes = [];
   root.traverse((child) => {
     if (!child.isMesh) return;
+    if ((child.name || '').toLowerCase().startsWith('skin_')) {
+      skinMeshes.push(child);
+      return;
+    }
     child.castShadow = true;
     child.receiveShadow = true;
     const matched = byMeshName.get(child.name);
@@ -75,7 +80,19 @@ function indexExternalModel(root, structures) {
     meshMap.set(structureId, child);
   });
 
-  return { root, meshMap, isDemoModel: false, center };
+  // Se o modelo externo possuir malhas com prefixo skin_, agrupa-as na Camada 01
+  let skinLayer = null;
+  if (skinMeshes.length) {
+    skinLayer = new THREE.Group();
+    skinLayer.name = 'external_layer_skin';
+    skinMeshes.forEach((m) => {
+      m.userData.naturalColor = m.material?.color?.clone() || new THREE.Color(0xb08d6a);
+      skinLayer.attach(m);
+    });
+    root.add(skinLayer);
+  }
+
+  return { root, meshMap, layers: { skin: skinLayer, bones: root }, isDemoModel: false, center };
 }
 
 export async function loadSpeciesModel(speciesId, structures, { onProgress, scaleMultiplier = 1 } = {}) {

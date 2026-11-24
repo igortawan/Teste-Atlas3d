@@ -16,6 +16,7 @@ export class SelectionManager {
     this.selectedId = null;
     this.hoveredId = null;
     this.xrayMode = false;
+    this.bonesLayerVisible = true;
     this.isolatedId = null;
     this.hiddenIds = new Set();
     this.outlineObj = null;
@@ -51,6 +52,7 @@ export class SelectionManager {
   }
 
   _pick(clientX, clientY) {
+    if (!this.bonesLayerVisible) return null;
     const rect = this.domElement.getBoundingClientRect();
     if (!rect.width || !rect.height) return null;
     const ndc = new THREE.Vector2(
@@ -61,6 +63,14 @@ export class SelectionManager {
     const candidates = [...this.meshMap.values()].filter((m) => m.visible);
     const hits = this.raycaster.intersectObjects(candidates, false);
     return hits[0] || null;
+  }
+
+  setBonesLayerVisible(visible) {
+    this.bonesLayerVisible = !!visible;
+    if (!this.bonesLayerVisible && this.hoveredId) {
+      this.hoveredId = null;
+      this.refreshMaterials();
+    }
   }
 
   _handlePointerUp(e) {

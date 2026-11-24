@@ -253,6 +253,7 @@ async function start3DMode(stage, { mode, pool, allStructures, speciesId, specie
   const canvasEl = stage.querySelector('#s3d-canvas');
   studyViewer = new Viewer3D(canvasEl, {
     quality: state.persisted.settings.quality,
+    initialLayerState: { preset: 'bones_only', skinVisible: false, skinOpacity: 0.38, skinStyle: 'natural', bonesVisible: true },
     onBoneClicked: (clickedId) => {
       if (mode !== 'locate' || locked) return;
       const target = targets[idx];

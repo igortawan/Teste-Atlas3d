@@ -116,6 +116,10 @@
     top: 40px; left: 8px; padding: 4px; gap: 3px;
     max-height: calc(100% - 92px);
   }
+  .layers-popover {
+    top: 78px; left: 54px; width: min(310px, calc(100% - 62px));
+    max-height: calc(100% - 94px);
+  }
   .tool-btn { width: 34px; height: 34px; }
 
   .study-3d-canvas { height: clamp(220px, 38dvh, 290px); }

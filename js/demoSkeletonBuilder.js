@@ -6,6 +6,7 @@
  */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { buildDemoBody } from './demoBodyBuilder.js';
 
 // Proporções reais aproximadas (em unidades normalizadas de cena, ~2.4 de comprimento total para mamíferos)
 const SPECIES_PROPORTIONS = {
@@ -576,7 +577,10 @@ export function buildDemoSkeleton(speciesId, structures, { scaleMultiplier = 1 }
   };
 
   const root = new THREE.Group();
-  root.name = `${speciesId}_demo_skeleton`;
+  root.name = `${speciesId}_demo_animal`;
+  const bonesGroup = new THREE.Group();
+  bonesGroup.name = `${speciesId}_layer_bones`;
+  root.add(bonesGroup);
   const meshMap = new Map();
 
   for (const bone of structures) {
@@ -588,6 +592,7 @@ export function buildDemoSkeleton(speciesId, structures, { scaleMultiplier = 1 }
     mesh.rotation.copy(rot);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
+    mesh.renderOrder = 1;
 
     // Calcula vetor de explosão anatômica coerente a partir da direção configurada e posição
     const dir = bone.explosionConfig?.direction || [0, 0.5, 0];
@@ -611,12 +616,12 @@ export function buildDemoSkeleton(speciesId, structures, { scaleMultiplier = 1 }
       landmarks: bone.landmarks || []
     };
 
-    root.add(mesh);
+    bonesGroup.add(mesh);
     meshMap.set(bone.id, mesh);
   }
 
   // Centraliza o esqueleto no eixo X/Z mantendo as patas apoiadas em Y = 0
-  const box = new THREE.Box3().setFromObject(root);
+  const box = new THREE.Box3().setFromObject(bonesGroup);
   const center = box.getCenter(new THREE.Vector3());
   const minY = box.min.y;
   for (const mesh of meshMap.values()) {
@@ -626,9 +631,18 @@ export function buildDemoSkeleton(speciesId, structures, { scaleMultiplier = 1 }
     mesh.userData.basePosition.copy(mesh.position);
   }
 
+  // Constrói a Camada 01 (Pele / Animal Completo) alinhada às posições centralizadas dos ossos
+  const skinGroup = buildDemoBody(speciesId, p, meshMap);
+  root.add(skinGroup);
+
   if (scaleMultiplier !== 1) {
     root.scale.setScalar(scaleMultiplier);
   }
 
-  return { root, meshMap, isDemoModel: true };
+  return {
+    root,
+    meshMap,
+    layers: { skin: skinGroup, bones: bonesGroup },
+    isDemoModel: true
+  };
 }

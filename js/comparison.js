@@ -12,6 +12,7 @@ import {
   findHomologueInSpecies
 } from './anatomyDatabase.js';
 import { loadSpeciesModel, disposeObject3D } from './modelLoader.js';
+import { applyLayersToModel, applyPresetToLayerState, createDefaultLayerState } from './layerManager.js';
 
 let activeCompareCtx = null;
 
@@ -63,6 +64,11 @@ export async function renderComparisonView(container, params = {}) {
           </div>
           <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
             <label class="small"><input type="checkbox" id="cmp-sync" checked /> Sincronizar câmeras</label>
+            <select class="select small" id="cmp-layers" style="width:auto;" aria-label="Camadas na comparação">
+              <option value="translucent" selected>Camadas: Pele Translúcida + Ossos</option>
+              <option value="animal_solid">Camada 01: Animal Completo (Pele)</option>
+              <option value="bones_only">Camada 02: Somente Esqueleto</option>
+            </select>
             <select class="select small" id="cmp-scale" style="width:auto;">
               <option value="normalized">Escala normalizada didática (não reflete tamanho real)</option>
               <option value="relative">Escala relativa aproximada (baseada na altura de referência)</option>
@@ -102,6 +108,8 @@ export async function renderComparisonView(container, params = {}) {
 
   const initAspect = w < 640 ? w / Math.max(120, h * 0.5) : (w * 0.5) / h;
 
+  let cmpLayerState = applyPresetToLayerState(createDefaultLayerState(), 'translucent');
+
   const buildHalfScene = async (spId, structures) => {
     const scene = new THREE.Scene();
     scene.add(new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 0.9));
@@ -116,8 +124,9 @@ export async function renderComparisonView(container, params = {}) {
     const cam = new THREE.PerspectiveCamera(42, initAspect, 0.05, 30);
     cam.position.set(2.45, 1.48, 3.05);
     const loaded = await loadSpeciesModel(spId, structures);
+    applyLayersToModel(loaded.layers, cmpLayerState);
     scene.add(loaded.root);
-    return { scene, cam, root: loaded.root, meshMap: loaded.meshMap, selectedId: null };
+    return { scene, cam, root: loaded.root, layers: loaded.layers, meshMap: loaded.meshMap, selectedId: null };
   };
 
   const [halfA, halfB] = await Promise.all([
@@ -323,6 +332,11 @@ export async function renderComparisonView(container, params = {}) {
   container.querySelector('#cmp-sp-a')?.addEventListener('change', (e) => renderComparisonView(container, { a: e.target.value, b: spB }));
   container.querySelector('#cmp-sp-b')?.addEventListener('change', (e) => renderComparisonView(container, { a: spA, b: e.target.value }));
   container.querySelector('#cmp-sync')?.addEventListener('change', (e) => { syncCam = e.target.checked; });
+  container.querySelector('#cmp-layers')?.addEventListener('change', (e) => {
+    cmpLayerState = applyPresetToLayerState(cmpLayerState, e.target.value);
+    applyLayersToModel(halfA.layers, cmpLayerState);
+    applyLayersToModel(halfB.layers, cmpLayerState);
+  });
   container.querySelector('#cmp-scale')?.addEventListener('change', (e) => {
     scaleMode = e.target.value;
     const maxH = Math.max(metaA.withersHeightM, metaB.withersHeightM);

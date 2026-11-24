@@ -10,6 +10,7 @@ import { SelectionManager } from './selectionManager.js';
 import { ExplodedViewController } from './explodedView.js';
 import { LandmarkManager } from './landmarkManager.js';
 import { loadSpeciesModel, loadUserUploadedModel, disposeObject3D } from './modelLoader.js';
+import { applyLayersToModel, createDefaultLayerState } from './layerManager.js';
 
 export class Viewer3D {
   constructor(container, callbacks = {}) {
@@ -20,6 +21,8 @@ export class Viewer3D {
     this.quality = callbacks.quality || 'medium';
     this.currentModelRoot = null;
     this.meshMap = new Map();
+    this.layers = null;
+    this.layerState = callbacks.initialLayerState ? { ...callbacks.initialLayerState } : createDefaultLayerState();
     this.isDemoModel = true;
     this.rafId = null;
     this.lastTime = performance.now();
@@ -170,19 +173,29 @@ export class Viewer3D {
     return loaded;
   }
 
-  _mountModel({ root, meshMap, isDemoModel }) {
+  _mountModel({ root, meshMap, layers, isDemoModel }) {
     this.currentModelRoot = root;
     this.meshMap = meshMap;
+    this.layers = layers || { skin: null, bones: root };
     this.isDemoModel = isDemoModel;
     this.scene.add(root);
 
     this.selection.setMeshMap(meshMap);
     this.exploded.setMeshMap(meshMap);
     this.landmarks.clear();
+    this.applyLayerState(this.layerState);
 
     const box = new THREE.Box3().setFromObject(root);
     this.cameraCtrl.setSceneBounds(box);
     this.cameraCtrl.reset();
+    this.needsRender = true;
+  }
+
+  applyLayerState(nextState) {
+    this.layerState = { ...this.layerState, ...nextState };
+    applyLayersToModel(this.layers, this.layerState, { explosionFactor: this.exploded.currentFactor });
+    this.selection.setBonesLayerVisible(this.layerState.bonesVisible);
+    this.landmarks.setEnabled(this.landmarks.enabled && this.layerState.bonesVisible);
     this.needsRender = true;
   }
 
@@ -194,6 +207,7 @@ export class Viewer3D {
       disposeObject3D(this.currentModelRoot);
       this.currentModelRoot = null;
     }
+    this.layers = null;
     this.meshMap = new Map();
   }
 
@@ -246,6 +260,9 @@ export class Viewer3D {
     const ctrlChanged = this.controls.update();
 
     if (exAnim || camAnim || pulseAnim || ctrlChanged || this.needsRender) {
+      if (exAnim && this.layers?.skin) {
+        applyLayersToModel(this.layers, this.layerState, { explosionFactor: this.exploded.currentFactor });
+      }
       this.landmarks.syncPositions();
       this.renderer.render(this.scene, this.camera);
       this.needsRender = false;

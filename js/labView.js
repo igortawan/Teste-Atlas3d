@@ -4,7 +4,11 @@
  * Anatomia Explodida (global e por região), Marcos Anatômicos 3D e Inspeção Individual.
  */
 import { icon } from './icons.js';
-import { state, setCurrentSpecies, setSelectedBone } from './state.js';
+import { state, setCurrentSpecies, setSelectedBone, updateLayerState } from './state.js';
+import {
+  ANATOMICAL_LAYERS, LAYER_PRESETS,
+  applyPresetToLayerState, detectPresetFromLayerState
+} from './layerManager.js';
 import {
   getAllSpeciesSync, getSpeciesMetaSync, loadSpeciesOsteology,
   getLoadedOsteologySync, getLoadedRegionsSync, getStructureByIdSync
@@ -46,6 +50,11 @@ export async function renderLabView(container, params = {}) {
         </div>
 
         <div class="lab-topbar-group">
+          <div class="layer-preset-bar" role="group" aria-label="Camadas rápidas 3D">
+            ${Object.values(LAYER_PRESETS).map((p) => `
+              <button class="layer-preset-btn ${state.layerState.preset === p.id ? 'active' : ''}" data-layer-preset="${p.id}" title="${p.fullLabel}">${p.label}</button>
+            `).join('')}
+          </div>
           <button class="btn btn-sm ${state.noLabelsMode ? 'btn-primary' : ''}" id="lab-nolabels-btn" title="Ocultar todos os nomes para simular avaliação prática">
             ${icon(state.noLabelsMode ? 'eye-off' : 'eye', 14)} ${state.noLabelsMode ? 'Sem etiquetas (ativo)' : 'Modo sem etiquetas'}
           </button>
@@ -73,6 +82,8 @@ export async function renderLabView(container, params = {}) {
           </div>
 
           <div class="floating-toolbar" role="toolbar" aria-label="Ferramentas 3D">
+            <button class="tool-btn" id="tl-layers" title="Camadas anatômicas (Pele, Ossos e futuras)">${icon('layers', 16)}</button>
+            <div class="tool-sep"></div>
             <button class="tool-btn" id="tl-reset-cam" title="Restaurar posição original (R)">${icon('rotate-ccw', 16)}</button>
             <button class="tool-btn" id="tl-center-cam" title="Centralizar câmera">${icon('crosshair', 16)}</button>
             <button class="tool-btn" id="tl-fullscreen" title="Tela cheia">${icon('maximize', 16)}</button>
@@ -80,7 +91,7 @@ export async function renderLabView(container, params = {}) {
             <button class="tool-btn" id="tl-isolate" title="Isolar osso selecionado">${icon('focus', 16)}</button>
             <button class="tool-btn" id="tl-hide" title="Ocultar osso selecionado">${icon('eye-off', 16)}</button>
             <button class="tool-btn" id="tl-show-all" title="Mostrar todas as estruturas">${icon('eye', 16)}</button>
-            <button class="tool-btn" id="tl-xray" title="Modo transparência / Raio-X">${icon('layers', 16)}</button>
+            <button class="tool-btn" id="tl-xray" title="Modo transparência / Raio-X dos ossos">${icon('scan-eye', 16)}</button>
             <div class="tool-sep"></div>
             <button class="tool-btn active" id="tl-landmarks" title="Ligar/desligar marcos anatômicos 3D">${icon('map-pin', 16)}</button>
             <button class="tool-btn" id="tl-inspect" title="Rotação / inspeção individual do osso">${icon('rotate-3d', 16)}</button>
@@ -102,6 +113,7 @@ export async function renderLabView(container, params = {}) {
 
           <div class="viewer-tooltip hidden" id="lab-tooltip"></div>
           <div class="landmark-popover hidden" id="lab-landmark-popover"></div>
+          <div class="layers-popover hidden" id="lab-layers-popover" aria-label="Painel de camadas anatômicas"></div>
 
           <div class="loading-overlay" id="lab-loading">
             ${icon('box', 28)}
@@ -196,6 +208,7 @@ export async function renderLabView(container, params = {}) {
 
   const viewer = new Viewer3D(canvasHost, {
     quality: state.persisted.settings.quality,
+    initialLayerState: state.layerState,
     onBoneClicked: (id) => selectStructureById(id, { focusCamera: state.persisted.settings.autoFocusSelection }),
     onBoneHover: (id, x, y) => {
       if (!id || state.noLabelsMode) { tooltipEl.classList.add('hidden'); return; }
@@ -266,6 +279,14 @@ export async function renderLabView(container, params = {}) {
     }
     setSelectedBone(bone.id);
     recordStructureVisit(bone);
+    // Se a pele estiver sólida (>=85%) ao selecionar um osso pela árvore/busca, torna-a translúcida para revelar a peça
+    if (state.layerState.skinVisible && state.layerState.skinOpacity >= 0.85) {
+      applyLayersAndSyncUI(applyPresetToLayerState(state.layerState, 'translucent'));
+      showToast('Camada 01 ajustada para translúcida para destacar o osso interno.', 'info');
+    }
+    if (!state.layerState.bonesVisible) {
+      applyLayersAndSyncUI({ bonesVisible: true });
+    }
     viewer.selectBone(bone, { focusCamera });
     treeUI.expandForBone(bone);
     panelUI.setBone(bone);
@@ -328,6 +349,136 @@ export async function renderLabView(container, params = {}) {
   if (params.bone && getStructureByIdSync(speciesId, params.bone)) {
     selectStructureById(params.bone, { focusCamera: true });
   }
+
+  const layersPopoverEl = container.querySelector('#lab-layers-popover');
+
+  function syncLayerPresetButtons() {
+    container.querySelectorAll('[data-layer-preset]').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.layerPreset === state.layerState.preset);
+    });
+  }
+
+  function renderLayersPopover() {
+    if (!layersPopoverEl) return;
+    const ls = state.layerState;
+    const pct = Math.round(ls.skinOpacity * 100);
+    layersPopoverEl.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <strong class="small" style="display:flex;align-items:center;gap:6px;">${icon('layers', 15)} Camadas Anatômicas 3D</strong>
+        <button class="btn btn-ghost btn-sm" id="layers-close-btn" aria-label="Fechar painel de camadas">${icon('x', 14)}</button>
+      </div>
+      <div class="chip-row">
+        ${Object.values(LAYER_PRESETS).map((p) => `
+          <button class="chip ${ls.preset === p.id ? 'active' : ''}" data-pop-preset="${p.id}">${p.fullLabel}</button>
+        `).join('')}
+      </div>
+      <div class="stack-list">
+        ${ANATOMICAL_LAYERS.map((layer) => {
+          if (layer.id === 'skin') {
+            return `
+              <div class="layer-row">
+                <div class="layer-row-head">
+                  <div>
+                    <strong class="small">${layer.code}: ${layer.name}</strong>
+                    <div class="small muted">${layer.subtitle}</div>
+                  </div>
+                  <label class="small" style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                    <input type="checkbox" id="lay-skin-vis" ${ls.skinVisible ? 'checked' : ''} /> Visível
+                  </label>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;">
+                  <span class="small muted">Opacidade</span>
+                  <input type="range" class="exploded-slider" id="lay-skin-opacity" min="10" max="100" value="${pct}" ${!ls.skinVisible ? 'disabled' : ''} />
+                  <span class="mono small" id="lay-skin-pct" style="min-width:36px;">${pct}%</span>
+                </div>
+                <div class="chip-row">
+                  <button class="chip ${ls.skinStyle === 'natural' ? 'active' : ''}" data-skin-style="natural">Pelagem natural</button>
+                  <button class="chip ${ls.skinStyle === 'clinical' ? 'active' : ''}" data-skin-style="clinical">Silhueta clínica</button>
+                </div>
+              </div>
+            `;
+          }
+          if (layer.id === 'bones') {
+            return `
+              <div class="layer-row">
+                <div class="layer-row-head">
+                  <div>
+                    <strong class="small">${layer.code}: ${layer.name}</strong>
+                    <div class="small muted">${osteology.count} estruturas osteológicas</div>
+                  </div>
+                  <label class="small" style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                    <input type="checkbox" id="lay-bones-vis" ${ls.bonesVisible ? 'checked' : ''} /> Visível
+                  </label>
+                </div>
+              </div>
+            `;
+          }
+          return `
+            <div class="layer-row future">
+              <div class="layer-row-head">
+                <div>
+                  <strong class="small">${layer.code}: ${layer.name}</strong>
+                  <div class="small muted">${layer.subtitle}</div>
+                </div>
+                <span class="badge">${icon('lock', 11)} Em breve</span>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+
+    layersPopoverEl.querySelector('#layers-close-btn')?.addEventListener('click', () => {
+      layersPopoverEl.classList.add('hidden');
+      container.querySelector('#tl-layers')?.classList.remove('active');
+    });
+    layersPopoverEl.querySelectorAll('[data-pop-preset]').forEach((b) => {
+      b.addEventListener('click', () => applyLayersAndSyncUI(applyPresetToLayerState(state.layerState, b.dataset.popPreset)));
+    });
+    layersPopoverEl.querySelector('#lay-skin-vis')?.addEventListener('change', (e) => {
+      const next = { ...state.layerState, skinVisible: e.target.checked };
+      next.preset = detectPresetFromLayerState(next);
+      applyLayersAndSyncUI(next);
+    });
+    layersPopoverEl.querySelector('#lay-skin-opacity')?.addEventListener('input', (e) => {
+      const op = Math.max(0.1, Math.min(1, Number(e.target.value) / 100));
+      const pctEl = layersPopoverEl.querySelector('#lay-skin-pct');
+      if (pctEl) pctEl.textContent = `${Math.round(op * 100)}%`;
+      const next = { ...state.layerState, skinVisible: true, skinOpacity: op };
+      next.preset = detectPresetFromLayerState(next);
+      updateLayerState(next);
+      viewer.applyLayerState(state.layerState);
+      syncLayerPresetButtons();
+    });
+    layersPopoverEl.querySelector('#lay-bones-vis')?.addEventListener('change', (e) => {
+      const next = { ...state.layerState, bonesVisible: e.target.checked };
+      next.preset = detectPresetFromLayerState(next);
+      applyLayersAndSyncUI(next);
+    });
+    layersPopoverEl.querySelectorAll('[data-skin-style]').forEach((b) => {
+      b.addEventListener('click', () => applyLayersAndSyncUI({ skinStyle: b.dataset.skinStyle }));
+    });
+  }
+
+  function applyLayersAndSyncUI(patch) {
+    updateLayerState(patch);
+    viewer.applyLayerState(state.layerState);
+    syncLayerPresetButtons();
+    if (!layersPopoverEl.classList.contains('hidden')) renderLayersPopover();
+  }
+
+  container.querySelectorAll('[data-layer-preset]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      applyLayersAndSyncUI(applyPresetToLayerState(state.layerState, btn.dataset.layerPreset));
+    });
+  });
+
+  container.querySelector('#tl-layers')?.addEventListener('click', (e) => {
+    const willOpen = layersPopoverEl.classList.contains('hidden');
+    if (willOpen) renderLayersPopover();
+    layersPopoverEl.classList.toggle('hidden', !willOpen);
+    e.currentTarget.classList.toggle('active', willOpen);
+  });
 
   // Eventos da barra superior, painéis e ferramentas
   container.querySelector('#lab-species-select')?.addEventListener('change', (e) => {

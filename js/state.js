@@ -2,6 +2,7 @@
  * Gerenciador de estado reativo centralizado do ATLAS VET 3D.
  */
 import { loadPersistedData, savePersistedData } from './storage.js';
+import { createDefaultLayerState } from './layerManager.js';
 
 const persisted = loadPersistedData();
 
@@ -18,6 +19,7 @@ const initialState = {
   isolatedBoneId: null,
   hiddenBoneIds: [],
   activeLandmarkId: null,
+  layerState: createDefaultLayerState(),
   persisted
 };
 
@@ -49,6 +51,11 @@ export function updateSettings(patch) {
   Object.assign(state.persisted.settings, patch);
   persistSoon();
   emit('settings:changed', state.persisted.settings);
+}
+
+export function updateLayerState(patch) {
+  Object.assign(state.layerState, patch);
+  emit('layers:changed', state.layerState);
 }
 
 export function updateProfile(patch) {
