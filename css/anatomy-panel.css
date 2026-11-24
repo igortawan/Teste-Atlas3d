@@ -1,0 +1,78 @@
+/* ==========================================================================
+   ATLAS VET 3D — Painel Direito: Ficha Anatômica Completa e Redimensionável
+   ========================================================================== */
+.lab-right-panel {
+  position: relative;
+  width: 390px; min-width: 310px; max-width: 640px; flex-shrink: 0;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; min-height: 0;
+  transition: height 0.22s ease;
+}
+.lab-right-panel.collapsed { display: none; }
+.sheet-expand-mobile-btn { display: none; }
+
+.resize-handle {
+  position: absolute; top: 0; bottom: 0; left: -4px; width: 8px;
+  cursor: col-resize; z-index: 15;
+}
+.resize-handle:hover { background: rgba(6, 182, 212, 0.35); }
+
+.sheet-header {
+  padding: 13px 15px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.sheet-title-row {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+}
+.sheet-title { margin: 0; font-size: 1.08rem; font-weight: 800; line-height: 1.25; }
+.sheet-latin { font-size: 0.82rem; font-style: italic; color: var(--accent-cyan); margin-top: 2px; }
+.sheet-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+.sheet-tabs {
+  display: flex; gap: 3px; overflow-x: auto; padding: 7px 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  scrollbar-width: none;
+}
+.sheet-tabs::-webkit-scrollbar { display: none; }
+.sheet-tab {
+  border: 1px solid transparent; background: transparent;
+  color: var(--text-secondary); border-radius: var(--radius-sm);
+  padding: 5px 9px; font-size: 0.77rem; font-weight: 600; white-space: nowrap;
+}
+.sheet-tab:hover { color: var(--text-primary); background: var(--bg-hover); }
+.sheet-tab.active {
+  color: var(--accent-emerald); background: var(--bg-active); border-color: var(--border-accent);
+}
+
+.sheet-body {
+  flex: 1; overflow-y: auto; padding: 14px 15px 24px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+
+.info-block {
+  padding: 11px 12px; border-radius: var(--radius-md);
+  background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+}
+.info-label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-muted); margin-bottom: 4px;
+}
+.info-text { font-size: 0.87rem; color: var(--text-primary); margin: 0; line-height: 1.55; }
+
+.kv-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+.landmark-card {
+  width: 100%; text-align: left;
+  padding: 9px 11px; border-radius: var(--radius-md);
+  background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+  transition: border-color var(--transition);
+}
+.landmark-card:hover { border-color: var(--accent-cyan); }
+
+.clinical-warning {
+  padding: 10px 12px; border-radius: var(--radius-md);
+  background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.32);
+  font-size: 0.8rem; color: var(--text-secondary);
+}

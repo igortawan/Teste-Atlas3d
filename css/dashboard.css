@@ -1,0 +1,129 @@
+/* ==========================================================================
+   ATLAS VET 3D — Dashboard principal, Estudo, Progresso e Biblioteca
+   ========================================================================== */
+.hero-banner {
+  display: grid; grid-template-columns: 1.45fr 1fr; gap: 18px;
+  padding: 22px 24px; margin-bottom: 22px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(6, 182, 212, 0.14), transparent 48%),
+    radial-gradient(circle at 12% 85%, rgba(16, 185, 129, 0.14), transparent 52%),
+    var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--accent-emerald); margin-bottom: 8px;
+}
+.hero-title { margin: 0 0 8px; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; }
+.hero-desc { margin: 0 0 16px; color: var(--text-secondary); max-width: 62ch; font-size: 0.94rem; }
+.hero-cta-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+.continue-card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 12px;
+}
+
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  padding: 15px 16px; display: flex; flex-direction: column; gap: 8px;
+}
+.kpi-top { display: flex; align-items: center; justify-content: space-between; color: var(--text-secondary); font-size: 0.82rem; font-weight: 600; }
+.kpi-value { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.02em; }
+.kpi-foot { font-size: 0.78rem; color: var(--text-muted); }
+
+.dash-columns {
+  display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px;
+  margin-bottom: 24px;
+}
+.panel-box { padding: 18px; }
+.panel-box-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 14px;
+}
+.panel-box-title { margin: 0; font-size: 1.02rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+/* Módulos anatômicos */
+.modules-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px;
+}
+.module-card {
+  text-align: left; width: 100%;
+  padding: 13px 14px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  display: flex; align-items: flex-start; gap: 11px;
+  transition: all var(--transition);
+}
+.module-card:hover { border-color: var(--border-strong); transform: translateY(-1px); }
+.module-card.implemented { border-color: rgba(16, 185, 129, 0.35); }
+.module-card.future { opacity: 0.82; }
+.module-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(16, 185, 129, 0.12); color: var(--accent-emerald);
+}
+.module-card.future .module-icon {
+  background: rgba(148, 163, 184, 0.12); color: var(--text-muted);
+}
+.module-name { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.module-desc { font-size: 0.78rem; color: var(--text-secondary); margin-top: 3px; }
+
+/* Listas laterais no dashboard */
+.stack-list { display: flex; flex-direction: column; gap: 9px; }
+.mini-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius-md);
+  background: var(--bg-elevated); border: 1px solid var(--border-subtle);
+}
+.mini-item-btn {
+  width: 100%; text-align: left; cursor: pointer;
+  transition: border-color var(--transition);
+}
+.mini-item-btn:hover { border-color: var(--accent-cyan); }
+
+/* Cards compactos de espécies no dashboard */
+.dash-species-strip {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px;
+}
+
+/* Estudo & Quiz */
+.study-grid { display: grid; grid-template-columns: 300px 1fr; gap: 18px; align-items: start; }
+.study-3d-canvas {
+  height: 370px; border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--border-subtle); background: #070b10;
+}
+.flashcard-stage {
+  perspective: 1000px; max-width: 680px; margin: 0 auto;
+}
+.flashcard-box {
+  min-height: 290px; padding: 26px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  border-radius: var(--radius-xl);
+  background: var(--bg-card); border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+.quiz-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.quiz-opt {
+  text-align: left; padding: 13px 15px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle); background: var(--bg-elevated);
+  font-weight: 500; transition: all var(--transition);
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent-cyan); background: var(--bg-hover); }
+.quiz-opt.correct { border-color: var(--accent-emerald); background: rgba(16, 185, 129, 0.18); }
+.quiz-opt.wrong { border-color: var(--accent-rose); background: rgba(244, 63, 94, 0.16); }
+
+/* Gráficos simples de progresso */
+.bar-chart { display: flex; flex-direction: column; gap: 10px; }
+.bar-row { display: grid; grid-template-columns: 130px 1fr 56px; align-items: center; gap: 10px; font-size: 0.84rem; }
+
+/* Biblioteca Científica */
+.refs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.ref-card { padding: 16px; display: flex; flex-direction: column; gap: 8px; }

@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "description": "Manifesto de modelos 3D segmentados (.glb/.gltf/.obj). Quando 'file' for null ou não encontrado, o ATLAS VET 3D ativa o Modo Demonstrativo Ilustrativo com aviso explícito na interface.",
+  "models": {
+    "bovine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/bovine/osteology.json" },
+    "equine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/equine/osteology.json" },
+    "caprine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/caprine/osteology.json" },
+    "ovine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/ovine/osteology.json" },
+    "swine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/swine/osteology.json" },
+    "canine": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/canine/osteology.json" },
+    "feline": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/feline/osteology.json" },
+    "avian": { "file": null, "format": "glb", "status": "demo_fallback", "notes": "Coloque skeleton.glb segmentado com meshName correspondente a data/avian/osteology.json" }
+  }
+}

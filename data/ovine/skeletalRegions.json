@@ -1,0 +1,240 @@
+{
+ "schemaVersion": 1,
+ "species": "ovine",
+ "tree": {
+  "id": "skeleton",
+  "name": "Esqueleto",
+  "latinName": "Skeleton",
+  "children": [
+   {
+    "id": "axial",
+    "name": "Esqueleto axial",
+    "latinName": "Skeleton axiale",
+    "region": null,
+    "subregion": null,
+    "children": [
+     {
+      "id": "skull",
+      "name": "Crânio",
+      "latinName": "Cranium",
+      "region": "skull",
+      "subregion": null,
+      "children": [
+       {
+        "id": "cranial_bones",
+        "name": "Ossos cranianos",
+        "latinName": "Ossa cranii",
+        "region": "skull",
+        "subregion": "cranial_bones",
+        "children": []
+       },
+       {
+        "id": "facial_bones",
+        "name": "Ossos faciais",
+        "latinName": "Ossa faciei",
+        "region": "skull",
+        "subregion": "facial_bones",
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "vertebral_column",
+      "name": "Coluna vertebral",
+      "latinName": "Columna vertebralis",
+      "region": "vertebral_column",
+      "subregion": null,
+      "children": [
+       {
+        "id": "cervical",
+        "name": "Vértebras cervicais",
+        "latinName": "Vertebrae cervicales",
+        "region": "vertebral_column",
+        "subregion": "cervical",
+        "children": []
+       },
+       {
+        "id": "thoracic",
+        "name": "Vértebras torácicas",
+        "latinName": "Vertebrae thoracicae",
+        "region": "vertebral_column",
+        "subregion": "thoracic",
+        "children": []
+       },
+       {
+        "id": "lumbar",
+        "name": "Vértebras lombares",
+        "latinName": "Vertebrae lumbales",
+        "region": "vertebral_column",
+        "subregion": "lumbar",
+        "children": []
+       },
+       {
+        "id": "sacral",
+        "name": "Sacro",
+        "latinName": "Os sacrum",
+        "region": "vertebral_column",
+        "subregion": "sacral",
+        "children": []
+       },
+       {
+        "id": "caudal",
+        "name": "Vértebras caudais",
+        "latinName": "Vertebrae caudales",
+        "region": "vertebral_column",
+        "subregion": "caudal",
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "thoracic_cage",
+      "name": "Caixa torácica",
+      "latinName": "Thorax",
+      "region": "thoracic_cage",
+      "subregion": null,
+      "children": [
+       {
+        "id": "ribs",
+        "name": "Costelas",
+        "latinName": "Costae",
+        "region": "thoracic_cage",
+        "subregion": "ribs",
+        "children": []
+       },
+       {
+        "id": "sternum",
+        "name": "Esterno",
+        "latinName": "Sternum",
+        "region": "thoracic_cage",
+        "subregion": "sternum",
+        "children": []
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "id": "appendicular",
+    "name": "Esqueleto apendicular",
+    "latinName": "Skeleton appendiculare",
+    "region": null,
+    "subregion": null,
+    "children": [
+     {
+      "id": "thoracic_limb",
+      "name": "Membro torácico",
+      "latinName": "Membrum thoracicum",
+      "region": "thoracic_limb",
+      "subregion": null,
+      "children": [
+       {
+        "id": "pectoral_girdle",
+        "name": "Cintura torácica (escapular)",
+        "latinName": "Cingulum membri thoracici",
+        "region": "thoracic_limb",
+        "subregion": "pectoral_girdle",
+        "children": []
+       },
+       {
+        "id": "arm",
+        "name": "Braço",
+        "latinName": "Brachium",
+        "region": "thoracic_limb",
+        "subregion": "arm",
+        "children": []
+       },
+       {
+        "id": "forearm",
+        "name": "Antebraço",
+        "latinName": "Antebrachium",
+        "region": "thoracic_limb",
+        "subregion": "forearm",
+        "children": []
+       },
+       {
+        "id": "manus",
+        "name": "Mão (carpo, metacarpo e dígitos)",
+        "latinName": "Manus",
+        "region": "thoracic_limb",
+        "subregion": "manus",
+        "children": []
+       }
+      ]
+     },
+     {
+      "id": "pelvic_limb",
+      "name": "Membro pélvico",
+      "latinName": "Membrum pelvicum",
+      "region": "pelvic_limb",
+      "subregion": null,
+      "children": [
+       {
+        "id": "pelvic_girdle",
+        "name": "Cintura pélvica",
+        "latinName": "Cingulum membri pelvici",
+        "region": "pelvic_limb",
+        "subregion": "pelvic_girdle",
+        "children": []
+       },
+       {
+        "id": "thigh",
+        "name": "Coxa",
+        "latinName": "Femur (regio)",
+        "region": "pelvic_limb",
+        "subregion": "thigh",
+        "children": []
+       },
+       {
+        "id": "leg",
+        "name": "Perna",
+        "latinName": "Crus",
+        "region": "pelvic_limb",
+        "subregion": "leg",
+        "children": []
+       },
+       {
+        "id": "pes",
+        "name": "Pé (tarso, metatarso e dígitos)",
+        "latinName": "Pes",
+        "region": "pelvic_limb",
+        "subregion": "pes",
+        "children": []
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "explosionScopes": [
+  {
+   "id": "all",
+   "name": "Esqueleto completo"
+  },
+  {
+   "id": "skull",
+   "name": "Crânio"
+  },
+  {
+   "id": "vertebral_column",
+   "name": "Coluna vertebral"
+  },
+  {
+   "id": "thoracic_cage",
+   "name": "Caixa torácica"
+  },
+  {
+   "id": "thoracic_limb",
+   "name": "Membro torácico"
+  },
+  {
+   "id": "pelvic_limb",
+   "name": "Membro pélvico"
+  },
+  {
+   "id": "pelvis",
+   "name": "Pelve"
+  }
+ ]
+}

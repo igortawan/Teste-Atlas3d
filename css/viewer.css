@@ -1,0 +1,238 @@
+/* ==========================================================================
+   ATLAS VET 3D — Laboratório 3D, Toolbars Flutuantes, Explosão e Comparação
+   ========================================================================== */
+.lab-shell {
+  display: flex; flex-direction: column;
+  flex: 1; height: 100%; min-height: 0;
+  overflow: hidden;
+}
+
+.lab-topbar {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 7px 14px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+}
+.lab-topbar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.lab-workspace {
+  position: relative; flex: 1; display: flex; overflow: hidden;
+  min-height: 0;
+}
+
+/* Painel esquerdo — Árvore Anatômica */
+.lab-left-panel {
+  width: 295px; min-width: 250px; flex-shrink: 0;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; min-height: 0;
+  transition: width 0.2s ease, margin 0.2s ease;
+}
+.lab-left-panel.collapsed { display: none; }
+
+.panel-head {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.panel-head h2 { margin: 0; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
+.tree-filters {
+  padding: 9px 10px; border-bottom: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; gap: 7px;
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip {
+  border: 1px solid var(--border-subtle); background: var(--bg-elevated);
+  color: var(--text-secondary); border-radius: 99px;
+  padding: 3px 9px; font-size: 0.74rem; font-weight: 600;
+}
+.chip.active {
+  background: var(--bg-active); color: var(--accent-emerald); border-color: var(--border-accent);
+}
+
+.tree-scroll {
+  flex: 1; overflow-y: auto; padding: 8px 6px 18px;
+}
+.tree-group-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 4px;
+  padding: 5px 6px; border-radius: var(--radius-sm);
+  font-size: 0.82rem; font-weight: 700; color: var(--text-primary);
+}
+.tree-group-header:hover { background: var(--bg-hover); }
+.tree-toggle {
+  flex: 1; display: flex; align-items: center; gap: 5px; text-align: left;
+  border: none; background: transparent; padding: 0; font-weight: 700;
+}
+.tree-children { padding-left: 12px; border-left: 1px dashed var(--border-subtle); margin-left: 9px; }
+.tree-leaf {
+  width: 100%; text-align: left; border: none; background: transparent;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  padding: 5px 8px; border-radius: var(--radius-sm);
+  font-size: 0.8rem; color: var(--text-secondary);
+}
+.tree-leaf:hover { background: var(--bg-hover); color: var(--text-primary); }
+.tree-leaf.selected {
+  background: var(--bg-active); color: var(--accent-emerald); font-weight: 600;
+}
+.tree-leaf-icons { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+/* Área central 3D */
+.lab-viewport-wrap {
+  position: relative; flex: 1; min-width: 0; overflow: hidden;
+  background: radial-gradient(circle at 50% 42%, #132033 0%, #070b10 82%);
+}
+[data-theme="light"] .lab-viewport-wrap {
+  background: radial-gradient(circle at 50% 42%, #e2e8f0 0%, #cbd5e1 85%);
+}
+.viewport-canvas-host { width: 100%; height: 100%; position: relative; }
+.viewport-canvas-host canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+/* Aviso claro de Modo Demonstrativo vs GLB real */
+.demo-banner {
+  position: absolute; top: 8px; left: 50%; transform: translateX(-50%); z-index: 25;
+  display: inline-flex; align-items: center; gap: 7px;
+  max-width: calc(100% - 140px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 4px 12px; border-radius: 999px;
+  background: rgba(12, 19, 29, 0.88); border: 1px solid rgba(245, 158, 11, 0.45);
+  color: #fde68a; font-size: 0.72rem; font-weight: 600; line-height: 1.25; backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+[data-theme="light"] .demo-banner {
+  background: rgba(255, 251, 235, 0.94); color: #92400e;
+}
+
+/* Barra de ferramentas flutuante lateral do 3D */
+.floating-toolbar {
+  position: absolute; top: 46px; left: 12px; z-index: 20;
+  display: flex; flex-direction: column; gap: 5px;
+  max-height: calc(100% - 92px); overflow-y: auto; scrollbar-width: none;
+  padding: 6px; border-radius: var(--radius-lg);
+  background: var(--bg-glass); border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(10px); box-shadow: var(--shadow-md);
+}
+.floating-toolbar::-webkit-scrollbar { display: none; }
+.tool-btn {
+  width: 36px; height: 36px; border-radius: var(--radius-md);
+  border: 1px solid transparent; background: transparent;
+  color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.tool-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.tool-btn.active {
+  background: var(--bg-active); color: var(--accent-emerald); border-color: var(--border-accent);
+}
+.tool-sep { height: 1px; background: var(--border-subtle); margin: 2px 4px; }
+
+/* Barra de vistas anatômicas (canto superior direito) */
+.camera-views-bar {
+  position: absolute; top: 46px; right: 12px; z-index: 20;
+  display: flex; flex-wrap: wrap; gap: 4px; max-width: 310px; justify-content: flex-end;
+  padding: 5px; border-radius: var(--radius-lg);
+  background: var(--bg-glass); border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(10px);
+}
+.view-pill {
+  border: 1px solid transparent; background: transparent; color: var(--text-secondary);
+  padding: 4px 8px; border-radius: var(--radius-sm); font-size: 0.74rem; font-weight: 600;
+}
+.view-pill:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+/* Dock inferior de Explosão Anatômica e Inspeção Individual */
+.exploded-dock {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 22;
+  width: min(640px, calc(100% - 24px));
+  padding: 10px 14px; border-radius: var(--radius-lg);
+  background: var(--bg-glass); border: 1px solid var(--border-strong);
+  backdrop-filter: blur(12px); box-shadow: var(--shadow-lg);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.exploded-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.exploded-slider { flex: 1; min-width: 140px; accent-color: var(--accent-emerald); }
+
+/* Tooltip de hover no 3D */
+.viewer-tooltip {
+  position: absolute; z-index: 30; pointer-events: none;
+  padding: 6px 10px; border-radius: var(--radius-sm);
+  background: rgba(7, 11, 16, 0.92); color: #f8fafc;
+  border: 1px solid var(--border-accent);
+  font-size: 0.78rem; box-shadow: var(--shadow-md);
+  white-space: nowrap;
+}
+
+/* Popover de marco anatômico selecionado */
+.landmark-popover {
+  position: absolute; top: 96px; right: 12px; z-index: 26;
+  width: min(320px, calc(100% - 24px));
+  padding: 12px 14px; border-radius: var(--radius-lg);
+  background: var(--bg-surface); border: 1px solid var(--accent-cyan);
+  box-shadow: var(--shadow-lg); font-size: 0.82rem;
+}
+
+/* Indicador de carregamento */
+.loading-overlay {
+  position: absolute; inset: 0; z-index: 35;
+  background: rgba(7, 11, 16, 0.72); backdrop-filter: blur(4px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+}
+
+/* Botões para reabrir painéis recolhidos e pílula mobile de explosão */
+.reopen-left-btn {
+  position: absolute; top: 10px; left: 10px; z-index: 24;
+}
+.reopen-right-btn {
+  position: absolute; top: 10px; right: 10px; z-index: 24;
+}
+.mobile-explode-open {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 22;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+}
+.lab-drawer-backdrop {
+  position: absolute; inset: 0; z-index: 38;
+  background: rgba(3, 7, 12, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+/* Barra de status inferior do laboratório */
+.lab-statusbar {
+  padding: 5px 14px; font-size: 0.76rem; color: var(--text-secondary);
+  background: var(--bg-surface); border-top: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+
+/* Anatomia Comparada (Canvas único Split-Viewport) */
+.compare-stage {
+  position: relative; height: 470px; border-radius: var(--radius-xl);
+  overflow: hidden; border: 1px solid var(--border-subtle);
+  background: radial-gradient(circle at 50% 45%, #132033 0%, #070b10 86%);
+  margin-bottom: 18px;
+}
+[data-theme="light"] .compare-stage {
+  background: radial-gradient(circle at 50% 45%, #e2e8f0 0%, #cbd5e1 88%);
+}
+.compare-divider {
+  position: absolute; top: 0; bottom: 0; left: 50%; width: 1px;
+  background: rgba(148, 163, 184, 0.35); pointer-events: none; z-index: 10;
+}
+.compare-label-left, .compare-label-right {
+  position: absolute; top: 12px; z-index: 12;
+  padding: 5px 11px; border-radius: 99px; font-size: 0.78rem; font-weight: 700;
+  background: var(--bg-glass); border: 1px solid var(--border-subtle); backdrop-filter: blur(8px);
+}
+.compare-label-left { left: 14px; }
+.compare-label-right { right: 14px; }
+.compare-stage.vertical-split { height: 470px; }
+.compare-stage.vertical-split .compare-divider {
+  top: 50%; bottom: auto; left: 0; right: 0; width: 100%; height: 1px;
+}
+.compare-stage.vertical-split .compare-label-left { top: 10px; left: 10px; }
+.compare-stage.vertical-split .compare-label-right { top: calc(50% + 10px); left: 10px; right: auto; }
+.compare-table {
+  width: 100%; border-collapse: collapse; font-size: 0.86rem;
+}
+.compare-table th, .compare-table td {
+  padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); text-align: left; vertical-align: top;
+}
+.compare-table th { color: var(--text-secondary); width: 190px; font-weight: 600; }
